@@ -20,7 +20,7 @@ class AuthController extends ResourceController
 
     $password = $jsonData->password;
 
-    $queryUser = $db->query("SELECT id, username, password FROM users WHERE username = ?", [$jsonData->username]);
+    $queryUser = $db->query("SELECT id, username, password FROM users WHERE username = ? AND role_id = 2", [$jsonData->username]);
 
     $user = $queryUser->getRow();
 
@@ -79,7 +79,144 @@ class AuthController extends ResourceController
 
     $password = password_hash($jsonData->password, PASSWORD_DEFAULT);
 
-    $queryUser = $db->query("INSERT INTO users (username, password, is_active) VALUES (?, ?, 1)", [$jsonData->username, $password]);
+    $queryUser = $db->query("INSERT INTO users (username, password, role_id, is_active) VALUES (?, ?, 2, 1)", [$jsonData->username, $password]);
+
+    $data = null;
+    $error = null;
+    $code = 200;
+
+    if ($queryUser) {
+      $insertID = $db->insertID();
+
+      helper('text');
+
+      $generateKey = random_string('alnum', 60);
+      $generateToken = random_string('alnum', 60);
+
+      $queryToken = $db->query("INSERT INTO tokens (user_id, token, secret_key) VALUES (?, ?, ?)", [$insertID, $generateToken, $generateKey]);
+
+      $userData = [
+        "id" => $insertID,
+        "name" => $jsonData->name,
+        "phone_number" => $jsonData->phone_number,
+        "email" => $jsonData->email,
+        "photo" => ""
+      ];
+
+      $queryUserProfile = $this->create_user_profile($userData);
+
+      $userAbout = [
+        "id" => $insertID,
+        "title" => $jsonData->title,
+        "description" => "",
+        "short_description" => "",
+        "banner" => ""
+      ];
+
+      $queryUserAbout = $this->create_user_about($userAbout);
+
+      if ($queryToken && $queryUserProfile && $queryUserAbout) {
+        if ($this->insert_menu_data($insertID)) {
+          $data = [
+            'message' => 'Akun, menu, tentang dan token berhasil dibuat!'
+          ];
+        } else {
+          $error = [
+            'message' => 'Akun dan token berhasil dibuat! Menu gagal dibuat 😭'
+          ];
+        }
+      } else {
+        $error = [
+          'message' => 'Akun berhasil dibuat! Token gagal dibuat 😭'
+        ];
+      }
+    } else {
+      $error = [
+        'message' => 'Akun, menu dan token gagal dibuat! 😭'
+      ];
+      $code = 400;
+    }
+
+
+    $db->close();
+
+    $data = [
+      'data' => $data,
+      'error' => $error
+    ];
+
+    return $this->respond($data, $code);
+  }
+
+  // admin segment
+
+  public function admin_login()
+  {
+    $db = \Config\Database::connect();
+
+    $jsonData = $this->request->getJSON();
+
+    $password = $jsonData->password;
+
+    $queryUser = $db->query("SELECT id, username, password FROM users WHERE username = ? AND role_id = 1", [$jsonData->username]);
+
+    $user = $queryUser->getRow();
+
+    if (!$user) {
+      $data = [
+        'data' => null,
+        'error' => [
+          'message' => 'Username tidak ditemukan'
+        ]
+      ];
+
+      return $this->respond($data, 200);
+    }
+
+    $data = null;
+    $error = null;
+    $code = 200;
+
+    if (password_verify($password, $user->password)) {
+      $queryToken = $db->query("SELECT id, user_id, token, secret_key FROM tokens WHERE user_id = ?", [$user->id]);
+
+      $token = $queryToken->getRow();
+
+      $data = [
+        'type' => 'user',
+        'id' => (int)$user->id,
+        'attributes' => [
+          'username' => $user->username,
+          'token' => $token->token,
+          'api_key' => $token->secret_key
+        ]
+      ];
+    } else {
+      $error = [
+        'message' => 'Username dan password tidak cocok!'
+      ];
+      $code = 200;
+    }
+
+    $db->close();
+
+    $data = [
+      'data' => $data,
+      'error' => $error
+    ];
+
+    return $this->respond($data, $code);
+  }
+
+  public function admin_register()
+  {
+    $db = \Config\Database::connect();
+
+    $jsonData = $this->request->getJSON();
+
+    $password = password_hash($jsonData->password, PASSWORD_DEFAULT);
+
+    $queryUser = $db->query("INSERT INTO users (username, password, role_id, is_active) VALUES (?, ?, 1, 1)", [$jsonData->username, $password]);
 
     $data = null;
     $error = null;

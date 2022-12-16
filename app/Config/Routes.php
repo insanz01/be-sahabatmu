@@ -35,6 +35,9 @@ $routes->setAutoRoute(true);
 
 $routes->post('auth/login', 'AuthController::login');
 $routes->post('auth/register', 'AuthController::register');
+
+$routes->post('admin/auth/login', 'AuthController::admin_login');
+$routes->post('admin/auth/register', 'AuthController::admin_register');
 // $routes->group('auth', function ($routes) {
 // });
 
