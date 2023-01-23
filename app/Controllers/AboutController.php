@@ -58,7 +58,7 @@ class AboutController extends ResourceController
         $imgURL = "http://localhost:8080";
       }
     } else {
-      $imgURL = "https://memofy.net/public";
+      $imgURL = "https://insandev.com/public";
     }
 
     $result = [
@@ -143,7 +143,7 @@ class AboutController extends ResourceController
             unlink($_SERVER["DOCUMENT_ROOT"] . "/uploads/" . $file->getFilename());
           } else {
 
-            unlink("/home/memofyne/public_html/public/uploads/" . $file->getFilename());
+            unlink("/home/n1572959/public_html/public/uploads/" . $file->getFilename());
           }
         }
       }
@@ -161,7 +161,7 @@ class AboutController extends ResourceController
           $display_image = 'http://' . $_SERVER['HTTP_HOST'] . "/uploads/" . $new_name;
         }
       } else {
-        $display_image = "https://memofy.net/public/uploads/" . $new_name;
+        $display_image = "https://insandev.com/public/uploads/" . $new_name;
       }
 
       $filepath = "/uploads/" . $new_name;
@@ -248,7 +248,7 @@ class AboutController extends ResourceController
             unlink($_SERVER["DOCUMENT_ROOT"] . "/uploads/" . $file->getFilename());
           } else {
 
-            unlink("/home/memofyne/public_html/public/uploads/" . $file->getFilename());
+            unlink("/home/n1572959/public_html/public/uploads/" . $file->getFilename());
           }
         }
       }
@@ -266,7 +266,7 @@ class AboutController extends ResourceController
           $display_image = 'http://' . $_SERVER['HTTP_HOST'] . "/uploads/" . $new_name;
         }
       } else {
-        $display_image = "https://memofy.net/public/uploads/" . $new_name;
+        $display_image = "https://insandev.com/public/uploads/" . $new_name;
       }
 
       $filepath = "/uploads/" . $new_name;
@@ -344,6 +344,27 @@ class AboutController extends ResourceController
       }
     }
 
+    $fullname = "";
+
+    if (property_exists($jsonData, "firstname")) {
+      if (!$jsonData->firstname) {
+        $error_message .= "Nama Depan tidak boleh kosong";
+      } else {
+        if ($update_query == "") {
+          $update_query .= "firstname = ?";
+        } else {
+          $update_query .= ", firstname = ?";
+        }
+        $fullname = $jsonData->firstname;
+      }
+    }
+
+    if (property_exists($jsonData, "lastname")) {
+      if ($jsonData->lastname != "") {
+        $fullname .= " " . $jsonData->lastname;
+      }
+    }
+
     if ($error_message != "") {
       $data = [
         "data" => null,
@@ -361,6 +382,7 @@ class AboutController extends ResourceController
 
     $currentTimestamp = date('Y-m-d H:i:s', time());
 
+    array_push($update_value, $fullname);
     array_push($update_value, $currentTimestamp);
     array_push($update_value, $user_id);
 

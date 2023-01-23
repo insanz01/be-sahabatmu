@@ -96,6 +96,56 @@ $routes->group('v1', ['filter' => 'token'], function ($routes) {
         $routes->post('/', 'MenuController::create');
     });
 
+    $routes->group('authors', function ($routes) {
+        $routes->get('/', 'AuthorController::index');
+    });
+    $routes->get('authors/(:any)', 'AuthorController::show/$1');
+
+    $routes->group('news', function ($routes) {
+        $routes->get('/', 'NewsController::index');
+        $routes->post('/', 'NewsController::create');
+    });
+    $routes->get('news/(:any)', 'NewsController::show/$1');
+    $routes->post('news/banner/(:any)', 'NewsController::upload_banner/$1');
+    $routes->put('news/(:any)', 'NewsController::change/$1');
+    $routes->delete('news/(:any)', 'NewsController::remove/$1');
+
+    $routes->group('counselors', function ($routes) {
+        $routes->get('/', 'CounselorController::index');
+        $routes->post('/', 'CounselorController::create');
+    });
+    $routes->get('counselors/(:any)', 'CounselorController::show/$1');
+    $routes->post('counselors/banner/(:any)', 'CounselorController::upload_image/$1');
+    $routes->put('counselors/(:any)', 'CounselorController::change/$1');
+    $routes->delete('counselors/(:any)', 'CounselorController::remove/$1');
+
+    $routes->group('guidances', function ($routes) {
+        $routes->get('/', 'GuidanceController::index');
+        $routes->post('/', 'GuidanceController::create');
+    });
+    $routes->get('guidances/(:any)', 'GuidanceController::show/$1');
+    $routes->post('guidances/banner/(:any)', 'GuidanceController::upload_image/$1');
+    $routes->put('guidances/(:any)', 'GuidanceController::change/$1');
+    $routes->delete('guidances/(:any)', 'GuidanceController::remove/$1');
+
+    $routes->group('lifeskills', function ($routes) {
+        $routes->get('/', 'LifeSkillController::index');
+        $routes->post('/', 'LifeSkillController::create');
+    });
+    $routes->get('lifeskills/(:any)', 'LifeSkillController::show/$1');
+    $routes->put('lifeskills/(:any)', 'LifeSkillController::change/$1');
+    $routes->delete('lifeskills/(:any)', 'LifeSkillController::remove/$1');
+
+    // $routes->group('categories', function ($routes) {
+    //     $routes->get('/', 'CategoriesController::index');
+    //     $routes->post('/', 'CategoriesController::create');
+    // });
+    $routes->get('categories/(:any)/(:any)', 'CategoriesController::show_category/$1/$2');
+    $routes->get('categories/(:any)', 'CategoriesController::get_category/$1');
+    $routes->post('categories/(:any)', 'CategoriesController::create_category/$1');
+    $routes->put('categories/(:any)/(:any)', 'CategoriesController::change_category/$1/$2');
+    $routes->delete('categories/(:any)/(:any)', 'CategoriesController::remove_category/$1/$2');
+
     $routes->group('glossaries', function ($routes) {
         $routes->get('/', 'GlossaryController::index');
         $routes->post('/', 'GlossaryController::create');
