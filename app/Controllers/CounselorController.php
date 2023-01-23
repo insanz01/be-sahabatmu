@@ -30,7 +30,7 @@ class CounselorController extends ResourceController
       return $this->respond("Invalid API Key", 403);
     }
 
-    $queryUserData = $db->query("SELECT role_id FROM users WHERE user_id = ?", [$user->user_id]);
+    $queryUserData = $db->query("SELECT role_id FROM users WHERE id = ?", [$user->user_id]);
     $userData = $queryUserData->getRow();
 
     $categoryFilter = $this->request->getGet("category_id");

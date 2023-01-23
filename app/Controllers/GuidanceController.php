@@ -32,7 +32,7 @@ class GuidanceController extends ResourceController
 
     $user_id = $user->user_id;
 
-    $queryUserData = $db->query("SELECT role_id FROM users WHERE user_id = ?", [$user->user_id]);
+    $queryUserData = $db->query("SELECT role_id FROM users WHERE id = ?", [$user->user_id]);
     $userData = $queryUserData->getRow();
     
     $queryGuidance = $db->query("SELECT id, user_id, title, meeting_url, banner FROM guidances WHERE deleted_at is NULL");
